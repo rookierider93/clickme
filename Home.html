@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Click Me If You Can</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-area {
+            position: relative;
+            width: 90vw;
+            height: 80vh;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        h1 {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            margin: 0;
+            color: #222;
+        }
+
+        p {
+            position: absolute;
+            top: 95px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #777;
+        }
+
+        #runawayButton {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+
+            padding: 16px 30px;
+            border: none;
+            border-radius: 10px;
+
+            background: #007bff;
+            color: white;
+
+            font-size: 18px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition:
+                left 0.12s ease,
+                top 0.12s ease,
+                transform 0.12s ease;
+        }
+
+        /* Success popup */
+        #successPopup {
+            display: none;
+
+            position: fixed;
+            inset: 0;
+
+            background: rgba(0, 0, 0, 0.65);
+
+            justify-content: center;
+            align-items: center;
+
+            z-index: 9999;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 45px 60px;
+            border-radius: 20px;
+            text-align: center;
+
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+            animation: popup 0.3s ease;
+        }
+
+        .popup-content h2 {
+            margin: 0 0 15px;
+            font-size: 42px;
+            color: #28a745;
+        }
+
+        .popup-content p {
+            position: static;
+            margin: 0 0 25px;
+            width: auto;
+            font-size: 20px;
+            color: #555;
+        }
+
+        .close-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+
+            background: #28a745;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        @keyframes popup {
+            from {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="game-area" id="gameArea">
+
+        <h1>Can You Click Me? 😈</h1>
+
+        <p>
+            Try to catch the button if you can!
+        </p>
+
+        <button id="runawayButton">
+            Click Me If You Can
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- Success Popup -->
+
+<div id="successPopup">
+
+    <div class="popup-content">
+
+        <h2>🎉 YOU WON! 🎉</h2>
+
+        <p>
+            Somehow... you actually clicked the button! 😱
+        </p>
+
+        <button class="close-button" id="closePopup">
+            Play Again
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const button = document.getElementById("runawayButton");
+    const gameArea = document.getElementById("gameArea");
+
+    const successPopup = document.getElementById("successPopup");
+    const closePopup = document.getElementById("closePopup");
+
+    // Distance at which button escapes
+    const escapeDistance = 120;
+
+
+    function moveButton() {
+
+        const areaRect = gameArea.getBoundingClientRect();
+        const buttonRect = button.getBoundingClientRect();
+
+        const maxX =
+            areaRect.width - buttonRect.width - 20;
+
+        const maxY =
+            areaRect.height - buttonRect.height - 20;
+
+        const minX = 20;
+        const minY = 150;
+
+        const randomX =
+            Math.floor(
+                Math.random() * (maxX - minX + 1)
+            ) + minX;
+
+        const randomY =
+            Math.floor(
+                Math.random() * (maxY - minY + 1)
+            ) + minY;
+
+        button.style.left = randomX + "px";
+        button.style.top = randomY + "px";
+        button.style.transform = "none";
+    }
+
+
+    // Detect mouse movement
+
+    gameArea.addEventListener("mousemove", function (event) {
+
+        const buttonRect =
+            button.getBoundingClientRect();
+
+        const buttonCenterX =
+            buttonRect.left +
+            buttonRect.width / 2;
+
+        const buttonCenterY =
+            buttonRect.top +
+            buttonRect.height / 2;
+
+        const distanceX =
+            event.clientX - buttonCenterX;
+
+        const distanceY =
+            event.clientY - buttonCenterY;
+
+        const distance =
+            Math.sqrt(
+                distanceX * distanceX +
+                distanceY * distanceY
+            );
+
+
+        if (distance < escapeDistance) {
+
+            moveButton();
+
+        }
+
+    });
+
+
+    // If mouse reaches button
+
+    button.addEventListener("mouseenter", function () {
+
+        moveButton();
+
+    });
+
+
+    /*
+        IMPORTANT:
+        If the user actually manages to click
+        the button, they win!
+    */
+
+    button.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        showWinPopup();
+
+    });
+
+
+    function showWinPopup() {
+
+        successPopup.style.display = "flex";
+
+        button.style.display = "none";
+
+    }
+
+
+    // Play again
+
+    closePopup.addEventListener("click", function () {
+
+        successPopup.style.display = "none";
+
+        button.style.display = "block";
+
+        // Put button back in the center
+
+        button.style.left = "50%";
+        button.style.top = "50%";
+        button.style.transform =
+            "translate(-50%, -50%)";
+
+    });
+
+
+    // Disable keyboard Tab navigation
+
+    button.setAttribute("tabindex", "-1");
+    closePopup.setAttribute("tabindex", "-1");
+
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Tab") {
+
+            event.preventDefault();
+
+        }
+
+    });
+
+
+    // Prevent focus
+
+    document.addEventListener("focusin", function (event) {
+
+        if (event.target !== closePopup) {
+
+            event.target.blur();
+
+        }
+
+    });
+
+
+    // Disable text selection
+
+    document.addEventListener("selectstart", function (event) {
+
+        event.preventDefault();
+
+    });
+
+
+    // Disable right-click
+
+    document.addEventListener("contextmenu", function (event) {
+
+        event.preventDefault();
+
+    });
+
+
+    // Mobile support
+
+    button.addEventListener("touchstart", function (event) {
+
+        event.preventDefault();
+
+        // Give the user a chance to win on touch
+
+        if (Math.random() < 0.1) {
+
+            showWinPopup();
+
+        } else {
+
+            moveButton();
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
